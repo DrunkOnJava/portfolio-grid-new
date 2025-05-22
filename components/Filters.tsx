@@ -24,8 +24,8 @@ const Filters: React.FC<FiltersProps> = ({
   ];
 
   return (
-    <div className="mb-8 space-y-6">
-      <div className="max-w-md mx-auto">
+    <div className="flex-1 space-y-4">
+      <div className="max-w-md">
         <input
           type="text"
           placeholder="Search projects..."
@@ -35,11 +35,11 @@ const Filters: React.FC<FiltersProps> = ({
         />
       </div>
       
-      <div className="flex flex-wrap justify-center gap-2">
+      <div className="flex flex-wrap gap-2">
         {filters.map((filter) => (
           <button
             key={filter.id}
-            className={`px-4 py-2 rounded-xl transition-colors ${
+            className={`px-4 py-2 rounded-xl transition-colors text-sm ${
               activeFilter === filter.id 
                 ? 'bg-accent text-white' 
                 : 'bg-secondary text-white hover:bg-opacity-80'

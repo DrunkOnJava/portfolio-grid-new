@@ -15,4 +15,5 @@ export interface Project {
   pexelsId?: number;
   photographer?: string;
   photographerUrl?: string;
+  uploadedAt?: string;
 }

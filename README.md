@@ -4,7 +4,8 @@ A modern responsive grid layout website displaying cards of varying content type
 
 ## Features
 
-- **Responsive Grid Layout**: Uses masonry layout with React Responsive Masonry for optimal card placement
+- **Responsive Grid Layout**: Uses CSS Grid with dense flow for optimal card placement
+- **Image Upload**: Upload your own images with automatic Git sync to GitHub
 - **Dark Theme**: Modern dark color scheme matching the design aesthetic
 - **Content Variety**: Supports different card types (images, icons, text content)
 - **Filtering System**: Filter projects by status (All, Success, Failed, Hidden)
@@ -12,6 +13,7 @@ A modern responsive grid layout website displaying cards of varying content type
 - **Variable Card Sizes**: Supports standard, wide, tall, and large card dimensions
 - **Status Indicators**: Visual status indicators for project states
 - **Hover Effects**: Smooth animations and overlay effects on card interaction
+- **Git Integration**: Automatic commits and pushes for uploaded images
 
 ## Technologies Used
 
@@ -51,6 +53,20 @@ node scripts/fetch-pexels-images.js
 
 This will update `data/projects.ts` with 45 new stock images from various categories.
 
+## Upload Feature
+
+The upload button allows you to permanently add your own images:
+
+1. **Click "Add Photo"** in the top right corner
+2. **Select an image** (max 10MB, common formats supported)
+3. **Automatic Processing**:
+   - Image is saved to `public/photos/` directory
+   - Automatically committed to your Git repository
+   - Pushed to GitHub for permanent storage
+   - Added to your portfolio grid immediately
+
+**Security Note**: Uploads are processed server-side with validation for file type and size limits.
+
 ## Project Structure
 
 ```
@@ -58,14 +74,22 @@ This will update `data/projects.ts` with 45 new stock images from various catego
 │   ├── Header.tsx      # Main header with stats
 │   ├── Filters.tsx     # Filter and search controls
 │   ├── ProjectCard.tsx # Individual project card
-│   └── ProjectGrid.tsx # Grid layout with masonry
+│   ├── ProjectGrid.tsx # Grid layout with CSS Grid
+│   ├── UploadButton.tsx # File upload component
+│   ├── UploadModal.tsx # Upload modal dialog
+│   └── PhotoCredit.tsx # Pexels photo attribution
 ├── data/               # Project data
-│   └── projects.ts     # Sample project data
+│   └── projects.ts     # Generated project data from Pexels
 ├── pages/              # Next.js pages
+│   ├── api/           # API endpoints
+│   │   └── upload.ts  # File upload handler
 │   ├── _app.tsx       # App wrapper
 │   └── index.tsx      # Main page
 ├── public/             # Static assets
-│   └── images/        # Image assets
+│   ├── images/        # Default image assets
+│   └── photos/        # Uploaded images directory
+├── scripts/            # Utility scripts
+│   └── fetch-pexels-images.js # Pexels API integration
 ├── styles/             # Global styles
 │   └── globals.css    # Tailwind and custom CSS
 └── types/              # TypeScript definitions
