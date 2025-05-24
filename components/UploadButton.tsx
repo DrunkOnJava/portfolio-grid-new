@@ -1,5 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Project } from '@/types';
+import Button from './Button';
+import Badge from './Badge';
+import Progress from './Progress';
 
 interface UploadButtonProps {
   onUploadSuccess: (project: Project) => void;
@@ -8,6 +11,7 @@ interface UploadButtonProps {
 const UploadButton: React.FC<UploadButtonProps> = ({ onUploadSuccess }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = () => {
@@ -32,15 +36,30 @@ const UploadButton: React.FC<UploadButtonProps> = ({ onUploadSuccess }) => {
 
     setIsUploading(true);
     setUploadStatus('Uploading...');
+    setUploadProgress(0);
 
     try {
       const formData = new FormData();
       formData.append('file', file);
 
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
+      
+      clearInterval(progressInterval);
+      setUploadProgress(100);
 
       const result = await response.json();
 
@@ -63,22 +82,17 @@ const UploadButton: React.FC<UploadButtonProps> = ({ onUploadSuccess }) => {
       setUploadStatus('Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
+      setTimeout(() => setUploadProgress(0), 500);
     }
   };
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <button
+      <Button
         onClick={handleFileSelect}
         disabled={isUploading}
-        className={`
-          px-6 py-3 rounded-xl font-medium transition-all duration-200
-          ${isUploading 
-            ? 'bg-gray-600 cursor-not-allowed' 
-            : 'bg-accent hover:bg-opacity-80 hover:shadow-lg'
-          }
-          text-white flex items-center gap-2
-        `}
+        variant="primary"
+        className="bg-accent hover:bg-opacity-80"
       >
         {isUploading ? (
           <>
@@ -87,14 +101,14 @@ const UploadButton: React.FC<UploadButtonProps> = ({ onUploadSuccess }) => {
           </>
         ) : (
           <>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                 d="M12 4v16m8-8H4" />
             </svg>
             Add Photo
           </>
         )}
-      </button>
+      </Button>
 
       <input
         ref={fileInputRef}
@@ -103,19 +117,29 @@ const UploadButton: React.FC<UploadButtonProps> = ({ onUploadSuccess }) => {
         onChange={handleFileChange}
         className="hidden"
       />
+      
+      {isUploading && (
+        <div className="w-full max-w-xs">
+          <Progress 
+            value={uploadProgress} 
+            size="sm" 
+            showLabel 
+            variant="default"
+          />
+        </div>
+      )}
 
       {uploadStatus && (
-        <div className={`
-          px-4 py-2 rounded-lg text-sm font-medium
-          ${uploadStatus.includes('successful') 
-            ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
-            : uploadStatus.includes('failed') || uploadStatus.includes('error')
-              ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-              : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+        <Badge 
+          variant={
+            uploadStatus.includes('successful') ? 'success' : 
+            uploadStatus.includes('failed') || uploadStatus.includes('error') ? 'error' : 
+            'info'
           }
-        `}>
+          className="px-4 py-2 text-sm"
+        >
           {uploadStatus}
-        </div>
+        </Badge>
       )}
 
       <p className="text-gray-400 text-sm text-center max-w-xs">

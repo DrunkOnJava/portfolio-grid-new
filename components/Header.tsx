@@ -1,12 +1,14 @@
 import React from 'react';
+import Tooltip from './Tooltip';
 
 interface StatProps {
   count: number;
   label: string;
   color: string;
+  tooltip?: string;
 }
 
-const Stat: React.FC<StatProps> = ({ count, label, color }) => {
+const Stat: React.FC<StatProps> = ({ count, label, color, tooltip }) => {
   const colorMap: Record<string, string> = {
     blue: 'bg-blue-500',
     green: 'bg-green-500',
@@ -14,21 +16,31 @@ const Stat: React.FC<StatProps> = ({ count, label, color }) => {
     gray: 'bg-gray-500',
   };
 
-  return (
+  const content = (
     <div className="flex items-center space-x-2">
       <span className={`w-2.5 h-2.5 rounded-full ${colorMap[color]}`}></span>
       <span className="font-bold">{count}</span>
       <span className="text-gray-400">{label}</span>
     </div>
   );
+
+  if (tooltip) {
+    return (
+      <Tooltip content={tooltip} placement="bottom">
+        {content}
+      </Tooltip>
+    );
+  }
+
+  return content;
 };
 
 const Header: React.FC = () => {
   const stats = [
-    { count: 71, label: 'Total', color: 'blue' },
-    { count: 56, label: 'Active', color: 'green' },
-    { count: 0, label: 'Hidden', color: 'yellow' },
-    { count: 15, label: 'Icons', color: 'gray' },
+    { count: 30, label: 'Total', color: 'blue', tooltip: 'Total number of projects in gallery' },
+    { count: 30, label: 'Active', color: 'green', tooltip: 'Projects marked as successful' },
+    { count: 0, label: 'Hidden', color: 'yellow', tooltip: 'Projects currently hidden from view' },
+    { count: 12, label: 'Apps', color: 'gray', tooltip: 'Application and software projects' },
   ];
 
   return (

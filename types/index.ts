@@ -1,5 +1,5 @@
 export type ProjectStatus = 'success' | 'failed' | 'hidden';
-export type ProjectSize = 'standard' | 'wide' | 'tall' | 'large';
+export type ProjectSize = 'square' | 'tallrec' | 'widerec' | 'largesq' | 'tinywide' | 'tinytall';
 
 export interface Project {
   id: number;
@@ -16,4 +16,6 @@ export interface Project {
   photographer?: string;
   photographerUrl?: string;
   uploadedAt?: string;
+  order?: number;
+  filename?: string;
 }

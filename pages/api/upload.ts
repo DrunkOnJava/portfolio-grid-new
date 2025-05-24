@@ -3,6 +3,7 @@ import formidable, { File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import { parseFileName } from '@/utils/fileNameParser';
 
 export const config = {
   api: {
@@ -41,15 +42,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const file = uploadedFile as UploadedFile;
     
-    // Generate a clean filename
-    const timestamp = Date.now();
+    // Use original filename or generate clean one
     const originalName = file.originalFilename || 'upload';
     const extension = path.extname(originalName);
-    const cleanName = originalName
-      .replace(extension, '')
-      .replace(/[^a-zA-Z0-9-_]/g, '-')
-      .toLowerCase();
-    const newFileName = `${cleanName}-${timestamp}${extension}`;
+    
+    // If filename follows naming convention, keep it; otherwise add timestamp
+    const hasValidFormat = /^\d+-(square|tallrec|widerec|largesq|tinywide|tinytall)-/.test(originalName);
+    const newFileName = hasValidFormat 
+      ? originalName
+      : `${Date.now()}-square-${originalName.replace(extension, '').replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase()}${extension}`;
     const newFilePath = path.join(process.cwd(), 'public/photos', newFileName);
 
     // Move and rename the file
@@ -72,14 +73,19 @@ Co-Authored-By: Claude <noreply@anthropic.com>"`, { cwd: process.cwd() });
       // Don't fail the upload if git operations fail
     }
 
+    // Parse filename for order and size information
+    const parsed = parseFileName(newFileName);
+    
     // Create new project entry
     const newProject = {
       id: Date.now(),
-      title: cleanName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      title: parsed.name,
       description: 'User uploaded image',
       image: `/photos/${newFileName}`,
       status: 'success' as const,
-      size: 'standard' as const,
+      size: parsed.size,
+      order: parsed.order,
+      filename: parsed.originalFileName,
       tags: ['upload', 'user-content'],
       uploadedAt: new Date().toISOString(),
     };

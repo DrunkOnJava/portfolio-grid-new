@@ -46,6 +46,15 @@
   .grid-flow-dense {
     grid-auto-flow: dense;
   }
+  
+  /* Custom grid sizing for tiny cards */
+  .min-h-100 {
+    min-height: 100px;
+  }
+
+  .max-w-150 {
+    max-width: 150px;
+  }
 }
 
 .masonry-grid {
